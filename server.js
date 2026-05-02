@@ -9,7 +9,7 @@ app.use(express.json());
 
 app.post("/gerar", async (req, res) => {
 
-  const prompt = req.body.prompt || "streetwear t-shirt design";
+  const { prompt } = req.body;
 
   try {
 
@@ -28,15 +28,18 @@ app.post("/gerar", async (req, res) => {
 
     const data = await response.json();
 
+    // 🔥 CORREÇÃO IMPORTANTE
     const base64 = data.data[0].b64_json;
-    const url = "data:image/png;base64," + base64;
+    const imageUrl = `data:image/png;base64,${base64}`;
 
-    res.json({ url });
+    res.json({ url: imageUrl });
 
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Erro na IA" });
   }
 
 });
 
-app.listen(3000, () => console.log("Servidor rodando"));
+app.listen(3000, () => {
+  console.log("Servidor rodando");
+});
