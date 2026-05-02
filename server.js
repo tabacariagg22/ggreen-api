@@ -1,10 +1,7 @@
 import express from "express";
 import fetch from "node-fetch";
-import cors from "cors";
 
 const app = express();
-
-app.use(cors());
 app.use(express.json());
 
 app.post("/gerar", async (req, res) => {
@@ -28,18 +25,29 @@ app.post("/gerar", async (req, res) => {
 
     const data = await response.json();
 
-    // 🔥 CORREÇÃO IMPORTANTE
-    const base64 = data.data[0].b64_json;
-    const imageUrl = `data:image/png;base64,${base64}`;
+    // 🔥 CORREÇÃO PRINCIPAL
+    const imagem = data?.data?.[0]?.url;
 
-    res.json({ url: imageUrl });
+    if (!imagem) {
+      return res.status(500).json({ error: "Erro ao gerar imagem" });
+    }
 
-  } catch (err) {
-    res.status(500).json({ error: "Erro na IA" });
+    // 👉 agora envia do jeito que o front espera
+    res.json({ url: imagem });
+
+  } catch (error) {
+
+    console.error(error);
+    res.status(500).json({ error: "Erro na API" });
+
   }
 
 });
 
+app.get("/", (req, res) => {
+  res.send("API rodando 🚀");
+});
+
 app.listen(3000, () => {
-  console.log("Servidor rodando");
+  console.log("Servidor rodando na porta 3000");
 });
